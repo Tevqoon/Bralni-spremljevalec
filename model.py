@@ -1,4 +1,4 @@
-import datetime, json
+import json
 
 class Account:
     def __init__(self, username, password, bookshelf):
@@ -72,10 +72,13 @@ class Bookshelf:
         return r
 
     def average_rates(self, author=None, category=None, state=None):
-        """returns the average reading rate of the group of books given by the constraints. 
-        If a rate for a book is calculated as 0, it is not considered."""
+        """returns the average reading rate of the group of books given
+        by the constraints. If a rate for a book is calculated as 0, 
+        it is not considered."""
         rates = []
-        for book in self.get_books(author=author, category=category, state=state):
+        for book in self.get_books(author=author, 
+                                   category=category, 
+                                   state=state):
             if (rate := book.reading_rate()) == 0:
                 pass
             else:
@@ -83,8 +86,9 @@ class Bookshelf:
         return sum(rates) / len(rates)
 
     def predict_time(self, title):
-        """returns the predicted time of reading a single book.
-        If a book does not have a reading rate, the average of the bookshelf is used"""
+        """returns the predicted time of reading a single book. If a 
+        book does not have a reading rate, the average of the bookshelf
+        is used"""
         if (time := (book := self.get_book(title)).predicted_time()) != 0:
             return time
         else:
@@ -95,10 +99,13 @@ class Bookshelf:
 
     def predicted_times(self, author=None, category=None, state=None):
         """Returns the predicted time of reading the whole library.
-        If a book does not have a reading rate, the average rate of the bookshelf is used."""
+        If a book does not have a reading rate, the average rate of the
+        bookshelf is used."""
         times = []
         avg = self.average_rates()
-        for book in self.get_books(author=author, category=category, state=state):
+        for book in self.get_books(author=author, 
+                                   category=category, 
+                                   state=state):
             if (time := book.predicted_time()) == 0:
                 times.append(book.pages * avg)
             else:
@@ -106,7 +113,8 @@ class Bookshelf:
         return sum(times)
 
 class Book:
-    def __init__(self, title, pages, current_page=0, author="", category="", time_spent=0, state=0, sessions=[]):
+    def __init__(self, title, pages, current_page=0, author="", 
+                 category="", time_spent=0, state=0, sessions=[]):
         self.title = title
         self.pages = pages
         self.current_page = current_page
@@ -114,14 +122,19 @@ class Book:
         self.category = category
         self.time_spent = time_spent
         self.state = 0 
-# 0 = not reading, 1 = reading, 2 = finished
         self.sessions = sessions
 
     def __repr__(self):
-        return "<" + self.title + ", " + self.author + ", " + str(self.current_page) + "/" + str(self.pages) + ", " + self.category + ", " + str(self.time_spent) + ", " + str(self.state) + ", " + str(self.sessions) + ">"
+        return ("<" + self.title + ", " + self.author + ", "
+            + str(self.current_page) + "/" + str(self.pages)
+            + ", " + self.category + ", " + str(self.time_spent)
+            + ", " + str(self.state) + ", " + str(self.sessions) + ">")
+
 
     def __str__(self):
-        return self.title + " by " + self.author + " in category " + self.category
+        return (self.title + " by " 
+            + self.author + " in category " 
+            + self.category)
 
     def book_dict(self):
         return {
