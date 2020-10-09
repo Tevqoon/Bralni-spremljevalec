@@ -32,6 +32,8 @@ def force_positive_integer(allow_empty=False, default="", leq_on=False):
 def make_choice(choices, multi=False):
     while True:
         for n, c in enumerate(choices):
+            if c == "Nazaj":
+                c = blue(c)
             print(blue(str(n + 1)) + ") " + c)
         if multi:
             r = []
@@ -98,13 +100,13 @@ def add_book():
     print("Prosimo, vnesite število strani (obvezno): ")
     pages = force_positive_integer()
     print("Vnesite trenutno stran (Če še ne berete, pustite prazno):")
-    current_page = force_integer(allow_empty=True, default=0, leq_on=True)
+    current_page = force_positive_integer(allow_empty=True, default=0, leq_on=True)
     print("Vnesite avtorja (ni obvezno):")
     author = input("* ")
     print("Vnesite kategorijo knjige (ni obvezno):")
     category = input("* ")
     print("Koliko časa že berete knjigo v minutah? (Če še ne, pustite prazno):")
-    time_spent = force_integer(allow_empty=True, default=0, leq_on=True)
+    time_spent = force_positive_integer(allow_empty=True, default=0, leq_on=True)
     book = model.Book(title, pages, current_page, author, category, time_spent)
     USER.bookshelf.add_book(book)
     print("Knjiga uspešno dodana.")
@@ -187,7 +189,14 @@ def book_editor(book_title):
         save()
 
 def book_deleter(book_title):
-    pass
+    print(red("Ste prepričani da želite izbrisati knjigo " + book_title + "?"))
+    print("Po izbrisu se ni mogoče premisliti.")
+    choice = make_choice(["Da", "Ne"])
+    if choice == "Da":
+        USER.bookshelf.remove_book(book_title)
+        print("Izbrisano.")
+    if choice == "Ne":
+        print("Brisanje preklicano.")
 
 def book_menu(book_title):
     reading_level = ["Nezačeta", "Začeta", "Prebrana"]
@@ -204,14 +213,14 @@ def book_menu(book_title):
         book_editor(book.title)
         book_menu(book.title)
     elif choice == "Zabeleži branje":
-        print("Koliko dolgo ste brali (v minutah)?")
+        print("Koliko časa ste brali (v minutah)?")
         session_time = force_positive_integer()
         print("Do katere strani ste prišli?")
         new_current_page = force_positive_integer()
         book.new_session(session_time, new_current_page)
         book_menu(book.title)
     elif choice == "Izbriši knjigo":
-        pass
+        book_deleter(book_title)
     elif choice == "Nazaj":
         save()
 
@@ -236,7 +245,8 @@ def main_menu():
 
 
 def main():
-    print("""Pozdravljeni v knjižnem pomagaču. Želite ustvariti novo knjižno polico ali naložiti obstoječo?""")
+    print("Dobrodošli v Bralnem spremljevalcu.")
+    print("Želite ustvariti novo knjižno polico ali naložiti obstoječo?""")
     init()
     while True:
         save()
