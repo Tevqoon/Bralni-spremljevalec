@@ -28,6 +28,8 @@ class Account:
         bookshelf = Bookshelf.load_state_dict(state_dict["bookshelf"])
         return Account(name, password, bookshelf)
 
+
+
 class Bookshelf:
     def __init__(self, books=set()):
         self.books = books
@@ -62,28 +64,47 @@ class Bookshelf:
     def remove_book(self, title):
         self.books.remove(self.get_book(title))
     
-    def get_books(self, author=None, category=None, state=None):
+    def get_books(self, authors=[], categories=[], states=[]):
         r = []
         for book in self.books:
-            if author == None or book.author == author:
-                if category == None or book.category == category:
-                    if state == None or book.state == state:
+            if authors == [] or book.author in authors:
+                if categories == [] or book.category in categories:
+                    if states == [] or book.state in states:
                         r.append(book)
         return r
 
-    def average_rates(self, author=None, category=None, state=None):
+    def list_authors(self):
+        a = set()
+        for book in self.books:
+            a.add(book.author)
+        return list(a)
+
+    def list_categories(self):
+        c = set()
+        for book in self.books:
+            c.add(book.category)
+        return list(c)
+
+    def list_books(self, authors=[], categories=[], states=[]):
+        t = set()
+        for book in self.get_books(authors, categories, states):
+            t.add(book.title)
+        return list(t)
+
+    def book_number(self, authors=[], categories=[], states=[]):
+        return len(self.get_books(authors, categories, states))
+
+    def average_rates(self, authors=[], categories=[], states=[]):
         """returns the average reading rate of the group of books given
         by the constraints. If a rate for a book is calculated as 0, 
         it is not considered."""
         rates = []
-        for book in self.get_books(author=author, 
-                                   category=category, 
-                                   state=state):
+        for book in self.get_books(authors, categories, states):
             if (rate := book.reading_rate()) == 0:
                 pass
             else:
                 rates.append(rate)
-        return sum(rates) / len(rates)
+        return sum(rates) / len(rates) if len(rates) != 0 else 0
 
     def predict_time(self, title):
         """returns the predicted time of reading a single book. If a 
@@ -97,20 +118,32 @@ class Bookshelf:
     def predict_remaining_time(self, title):
         return self.predict_time(title) - self.get_book(title).time_spent
 
-    def predicted_times(self, author=None, category=None, state=None):
-        """Returns the predicted time of reading the whole library.
+    def total_times(self, authors=[], categories=[], states=[]):
+        t = 0
+        for book in self.get_books(authors, categories, states):
+            t += book.time_spent
+        return t
+
+    def predicted_times(self, authors=[], categories=[], states=[]):
+        """Returns the predicted time of reading the selected group.
         If a book does not have a reading rate, the average rate of the
-        bookshelf is used."""
+        group is used."""
         times = []
         avg = self.average_rates()
-        for book in self.get_books(author=author, 
-                                   category=category, 
-                                   state=state):
+        for book in self.get_books(authors, categories, states):
             if (time := book.predicted_time()) == 0:
                 times.append(book.pages * avg)
             else:
                 times.append(time)
         return sum(times)
+
+    def group_stats(self, authors=[], categories=[], states=[]):
+        spent = self.total_times(authors, categories, states)
+        return {"avg_rates" : str(round(self.average_rates(authors, categories, states), 2)),
+                "time_spent_h" : str(round(spent / 60, 1)),
+                "time_rest_h" : str(round((self.predicted_times(authors, categories, states) - spent) / 60, 1)),
+                "book_number" : self.book_number(authors, categories, states),
+                "finished_number" : self.book_number(authors, categories, [2])}
 
 class Book:
     def __init__(self, title, pages, current_page=0, author="", 
@@ -155,15 +188,14 @@ class Book:
                     time_spent=dictionary["time_spent"],
                     state=dictionary["state"])
 
-
-    def progress(self):
-        return (self.current_page, self.pages, self.time_spent)
-
     def update_title(self, title):
         self.title = title
 
     def update_pages(self, pages):
         self.pages = pages
+        if self.pages < self.current_page:
+            self.current_page = self.pages
+            self.state = 2
 
     def update_author(self, author):
         self.author = author
@@ -191,11 +223,20 @@ class Book:
 
     def reading_rate(self):
         "Returns a reading rate for current book in minutes/page"
-        return self.time_spent / self.current_page
+        if self.current_page == 0:
+            return 0
+        else:
+            return round(self.time_spent / self.current_page, 2)
 
     def predicted_time(self):
         return self.reading_rate() * self.pages
 
+    def basic_stats(self):
+        return {"progress_quotient" : str(self.current_page) + "/" + str(self.pages), 
+                "percentage" : str(round(self.current_page / self.pages, 4) * 100) + "%",
+                "time_spent_h" : str(round(self.time_spent / 60, 1)),
+                "time_rest_h" : str(round((self.predicted_time() - self.time_spent) / 60, 1)),
+                "reading_rate" : str(self.reading_rate())}
 
 
 
