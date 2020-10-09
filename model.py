@@ -46,7 +46,7 @@ class Bookshelf:
         return Bookshelf(new_books)
 
     def __str__(self):
-        string = "This bookshelf contains: "
+        string = "Ta knjižna polica vsebuje: "
         for book in self.books:
             string += book.title + ", "
         return string[:-2] + "."
@@ -114,7 +114,7 @@ class Bookshelf:
 
 class Book:
     def __init__(self, title, pages, current_page=0, author="", 
-                 category="", time_spent=0, state=0, sessions=[]):
+                 category="", time_spent=0, state=0):
         self.title = title
         self.pages = pages
         self.current_page = current_page
@@ -122,18 +122,16 @@ class Book:
         self.category = category
         self.time_spent = time_spent
         self.state = 0 
-        self.sessions = sessions
 
     def __repr__(self):
         return ("<" + self.title + ", " + self.author + ", "
             + str(self.current_page) + "/" + str(self.pages)
             + ", " + self.category + ", " + str(self.time_spent)
-            + ", " + str(self.state) + ", " + str(self.sessions) + ">")
-
+            + ", " + str(self.state) + ">")
 
     def __str__(self):
-        return (self.title + " by " 
-            + self.author + " in category " 
+        return (self.title + " avtorja " 
+            + self.author + " v kategoriji " 
             + self.category)
 
     def book_dict(self):
@@ -145,7 +143,6 @@ class Book:
                 "category" : self.category,
                 "time_spent" : self.time_spent,
                 "state" : self.state,
-                "sessions" : self.sessions
             }
 
     @staticmethod
@@ -156,8 +153,7 @@ class Book:
                     author=dictionary["author"],
                     category=dictionary["category"],
                     time_spent=dictionary["time_spent"],
-                    state=dictionary["state"],
-                    sessions=dictionary["sessions"])
+                    state=dictionary["state"])
 
 
     def progress(self):
@@ -183,7 +179,6 @@ class Book:
         self.current_page = 0
         self.time_spent = 0
         self.state = 0
-        self.sessions=[]
 
     def new_session(self, session_time, final_page):
         "Adds a new reading session to the book"
@@ -193,7 +188,6 @@ class Book:
         elif final_page > 0:
             self.state = 1
         self.current_page = min(self.pages, final_page)
-        self.sessions.append((session_time, final_page))
 
     def reading_rate(self):
         "Returns a reading rate for current book in minutes/page"
@@ -208,41 +202,3 @@ class Book:
     
 
 
-b1 = Book("Phenomenology of spirit", 400, author="Hegel", category="Nonsense")
-b2 = Book("Science of logic", 200, author="Hegel", category="Logic", current_page=120, time_spent=160)
-b3 = Book("Critique of pure reason", 700, author="Kant", category="Nonsense", current_page=432)
-
-shelf = Bookshelf({b1, b2, b3})
-
-shelf.get_book("Phenomenology of spirit").new_session(30, 10)
-shelf.get_book("Phenomenology of spirit").new_session(30, 30)
-shelf.get_book("Phenomenology of spirit").new_session(60, 43)
-
-print(shelf.get_book("Phenomenology of spirit"))
-print(shelf.get_book("Phenomenology of spirit").progress())
-print(shelf.get_book("Phenomenology of spirit").reading_rate())
-print(shelf.get_book("Phenomenology of spirit").predicted_time())
-
-print(shelf.get_book("Science of logic"))
-print(shelf.get_book("Science of logic").progress())
-print(shelf.get_book("Science of logic").reading_rate())
-print(shelf.get_book("Science of logic").predicted_time())
-
-print(shelf.get_book("Critique of pure reason"))
-print(shelf.get_book("Critique of pure reason").progress())
-print(shelf.get_book("Critique of pure reason").reading_rate())
-print(shelf.get_book("Critique of pure reason").predicted_time())
-
-print([b.title for b in shelf.get_books(author="Hegel")])
-print([b.title for b in shelf.get_books(category="Nonsense")])
-
-print(shelf.predicted_times())
-print(shelf.average_rates())
-
-shelf2 = Bookshelf.load_state_dict(shelf.state_dict())
-print(shelf2)
-
-tevqoon = Account("Tevqoon", "123", shelf)
-tevqoon.save_state("tevqoon.json")
-
-tevqoon2 = Account.load_state("tevqoon.json")
