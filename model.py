@@ -143,7 +143,7 @@ class Bookshelf:
                 "time_spent_h" : str(round(spent / 60, 1)),
                 "time_rest_h" : str(round((self.predicted_times(authors, categories, states) - spent) / 60, 1)),
                 "book_number" : self.book_number(authors, categories, states),
-                "finished_number" : self.book_number(authors, categories, [2])}
+                "finished_number" : self.book_number(authors, categories, [2]) if (2 in states) or (states == []) else 0.}
 
 class Book:
     def __init__(self, title, pages, current_page=0, author="", 
@@ -154,7 +154,7 @@ class Book:
         self.author = author
         self.category = category
         self.time_spent = time_spent
-        self.state = 0 
+        self.state = state
 
     def __repr__(self):
         return ("<" + self.title + ", " + self.author + ", "
@@ -217,6 +217,8 @@ class Book:
         self.time_spent += session_time
         if final_page >= self.pages:
             self.state = 2
+        elif final_page <= self.pages:
+            return
         elif final_page > 0:
             self.state = 1
         self.current_page = min(self.pages, final_page)

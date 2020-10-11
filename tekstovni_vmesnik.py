@@ -32,7 +32,7 @@ def force_positive_integer(allow_empty=False, default="", leq_on=False):
 def make_choice(choices, multi=False):
     while True:
         for n, c in enumerate(choices):
-            if c == "Nazaj":
+            if c in ["Nazaj", "Vse"]:
                 c = blue(c)
             print(blue(str(n + 1)) + ") " + c)
         if multi:
@@ -54,14 +54,13 @@ def init():
     global USER
     global FILENAME
     if choice == "novo":
-        print("""Prosimo vnesite uporabniško ime. V tekstovnem vmesniku je geslo prazno.""")
+        print("""Prosimo vnesite uporabniško ime.""")
         username = input("* ")
-        print("""Prosimo vsenite ime datoteke (brez končnice .json), kamor boste shranili svoj račun.""")
+        print("""Prosimo vnesite ime datoteke (brez končnice .json), kamor boste shranili svoj račun.""")
         FILENAME = input("* ") + ".json"
         USER = model.Account(username, "", model.Bookshelf())
         save()
         print("""Hvala. Uživajte v uporabi.""")
-
     elif choice == "obstoječo":
         print("""prosimo vnesite ime datoteke (brez končnice .json), ki jo želite naložiti.""")
         FILENAME = input("* ") + ".json"
@@ -75,10 +74,12 @@ def group_statistics(authors=[], categories=[], states=[]):
     s = USER.bookshelf.group_stats(authors, categories, states)
     if s["book_number"] != 0:
         print("Prebrane knjige: " + str(s["finished_number"]) + "/" + str(s["book_number"])
-          + " (" + str(round((s["finished_number"] / s["book_number"]) / 100, 2)) + "%)")
-    print("Skupni čas branja: " + s["time_spent_h"] + " ur.")
-    print("Predviden preostali skupni čas: " + s["time_rest_h"] + " ur.")
-    print("Povprečna hitrost branja: " + s["avg_rates"] + " minut/stran.")
+          + " (" + str(round((s["finished_number"] / s["book_number"]) * 100, 2)) + "%)")
+        print("Skupni čas branja: " + s["time_spent_h"] + " ur.")
+        print("Predviden preostali skupni čas: " + s["time_rest_h"] + " ur.")
+        print("Povprečna hitrost branja: " + s["avg_rates"] + " minut/stran.")
+    else:
+        print("V tej skupini še ni knjig.")
 
 def book_statistics(title):
     s = USER.bookshelf.get_book(title).basic_stats()
@@ -88,8 +89,8 @@ def book_statistics(title):
     print("Predviden preostali čas: " + str(rem_time) + " ur.")
     print("Povprečna hitrost branja: " + s["reading_rate"] + " minut/stran.")
 
-def add_book():
-    print("Prosimo, vnesite naslov knjige (obvezno): ")
+def book_adder():
+    print("Prosimo, vnesite naslov knjige" + red("(obvezno)") + ": ")
     title = input("* ")
     while title == "" or title in USER.bookshelf.list_books():
         if title == "":
@@ -97,7 +98,7 @@ def add_book():
         else:
             print(red("Naslovi se ne smejo ponavljati."))
         title = input("* ")
-    print("Prosimo, vnesite število strani (obvezno): ")
+    print("Prosimo, vnesite število strani" + red("(obvezno)") + ": ")
     pages = force_positive_integer()
     print("Vnesite trenutno stran (Če še ne berete, pustite prazno):")
     current_page = force_positive_integer(allow_empty=True, default=0, leq_on=True)
@@ -116,17 +117,21 @@ def list_filters():
     if FILTER_AUTHOR == [] and FILTER_CATEGORY == [] and FILTER_READING == []:
         print("Trenutno ni aktivnih filtrov.")
     elif FILTER_AUTHOR != []:
-        print("Trenutno filtrirate po avtorjih:")
+        string = ""
         for i in FILTER_AUTHOR:
-            print(i)
+            string += i + ", "
+        print("Trenutno filtrirate po avtorjih: " + string[:-2] + ".")
+        
         if FILTER_CATEGORY != []:
-            print("in po kategorijah:")
+            string = "" 
             for i in FILTER_CATEGORY:
-                print(i)
+                string += i + ", "
+            print("In po kategorijah: " + string[:-2] + ".")
     elif FILTER_CATEGORY != []:
-        print("Trenutno filtrirate po kategorijah:")
+        string = ""
         for i in FILTER_CATEGORY:
-                print(i)
+                string += i + ", "
+        print("Trenutno filtrirate po kategorijah: " + string[:-2] + ".")
     if FILTER_READING != []:
         if len(FILTER_READING) == 1:
             print("Trenutno prikazujete le " + stanja[FILTER_READING[0]] + " knjige.")
@@ -149,12 +154,12 @@ def set_filters():
         set_filters()
     elif choice == "Nastavi avtorje":
         print("Izberite avtorje (vpišite številke vseh, ki jih želite v filtru).")
-        mchoice = make_choice(["Vse"] + USER.bookshelf.list_authors(), multi=True)
+        mchoice = make_choice(["Vse"] + sorted(USER.bookshelf.list_authors()), multi=True)
         FILTER_AUTHOR = [] if "Vse" in mchoice else mchoice
         set_filters()
     elif choice == "Nastavi kategorije":
         print("Izberite kategorije (vpišite številke vseh, ki jih želite v filtru).")
-        mchoice = make_choice(["Vse"] + USER.bookshelf.list_categories(), multi=True)
+        mchoice = make_choice(["Vse"] + sorted(USER.bookshelf.list_categories()), multi=True)
         FILTER_CATEGORY = [] if "Vse" in mchoice else mchoice
         set_filters()
     elif choice == "Nastavi stanje knjige":
@@ -186,30 +191,30 @@ def book_editor(book_title):
         print("Vnesite novo kategorijo:")
         book.update_category(input("* "))
     elif choice == "Nazaj":
-        save()
+        pass
 
 def book_deleter(book_title):
     print(red("Ste prepričani da želite izbrisati knjigo " + book_title + "?"))
-    print("Po izbrisu se ni mogoče premisliti.")
+    print("Po izbrisu si ni mogoče premisliti.")
     choice = make_choice(["Da", "Ne"])
     if choice == "Da":
         USER.bookshelf.remove_book(book_title)
         print("Izbrisano.")
+        list_books()
     if choice == "Ne":
         print("Brisanje preklicano.")
+        book_menu(book_title)
 
 def book_menu(book_title):
     reading_level = ["Nezačeta", "Začeta", "Prebrana"]
     book = USER.bookshelf.get_book(book_title)
-    print(book_title)
+    print(blue(book_title))
+    book_statistics(book.title)
     print("Avtor: " + book.author)
     print("Kategorija: " + book.category)
-    print("Stanje knjige: " + reading_level[book.state])
-    choice = make_choice(["Prikaži statistiko","Uredi podatke", "Zabeleži branje", "Izbriši knjigo", "Nazaj"])
-    if choice == "Prikaži statistiko":
-        book_statistics(book.title)
-        book_menu(book.title)
-    elif choice == "Uredi podatke":
+    print("Stanje knjige: " + reading_level[book.state] + " (" + str(book.current_page) + "/" + str(book.pages) + ")")
+    choice = make_choice(["Uredi podatke", "Zabeleži branje", "Izbriši knjigo", "Nazaj"])
+    if choice == "Uredi podatke":
         book_editor(book.title)
         book_menu(book.title)
     elif choice == "Zabeleži branje":
@@ -222,34 +227,34 @@ def book_menu(book_title):
     elif choice == "Izbriši knjigo":
         book_deleter(book_title)
     elif choice == "Nazaj":
-        save()
+        pass
 
 def list_books():
-    choice = make_choice(["Nazaj"] + USER.bookshelf.list_books(FILTER_AUTHOR, FILTER_CATEGORY, FILTER_READING))
+    choice = make_choice(["Nazaj"] + sorted(USER.bookshelf.list_books(FILTER_AUTHOR, FILTER_CATEGORY, FILTER_READING)))
     if choice == "Nazaj":
         pass
     else:
         book_menu(choice)
 
 def main_menu():
-    list_filters()
-    choice = make_choice(["Splošna statistika", "Seznam knjig", "Dodaj knjigo", "Nastavi filtre"])
-    if choice == "Splošna statistika":
-        group_statistics(FILTER_AUTHOR, FILTER_CATEGORY, FILTER_READING)
-    elif choice == "Seznam knjig":
+    book_number = USER.bookshelf.book_number(FILTER_AUTHOR, FILTER_CATEGORY, FILTER_READING) 
+    if book_number != 0:
+        list_filters()
+    group_statistics(FILTER_AUTHOR, FILTER_CATEGORY, FILTER_READING)
+    choice = make_choice(["Seznam knjig", "Dodaj knjigo", "Nastavi filtre"])
+    if choice == "Seznam knjig":
         list_books()
     elif choice == "Dodaj knjigo":
-        add_book()
+        book_adder()
     elif choice == "Nastavi filtre":
         set_filters()
 
 
 def main():
     print("Dobrodošli v Bralnem spremljevalcu.")
-    print("Želite ustvariti novo knjižno polico ali naložiti obstoječo?""")
+    print("Želite ustvariti novo knjižno polico ali naložiti obstoječo?")
     init()
     while True:
-        save()
         main_menu()
 
 main()
