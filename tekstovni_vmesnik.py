@@ -32,11 +32,7 @@ def force_positive_integer(allow_empty=False, default="", leq_on=False):
 def make_choice(choices, multi=False):
     while True:
         for n, c in enumerate(choices):
-<<<<<<< HEAD
             if c in ["Nazaj", "Vse"]:
-=======
-            if c == "Nazaj":
->>>>>>> ed3c69fcfd501c994c7f853cafe6b96a26666463
                 c = blue(c)
             print(blue(str(n + 1)) + ") " + c)
         if multi:
