@@ -199,24 +199,15 @@ def book_editor(book_title):
 
 def book_deleter(book_title):
     print(red("Ste prepričani da želite izbrisati knjigo " + book_title + "?"))
-<<<<<<< HEAD
     print("Po izbrisu si ni mogoče premisliti.")
-=======
-    print("Po izbrisu se ni mogoče premisliti.")
->>>>>>> ed3c69fcfd501c994c7f853cafe6b96a26666463
     choice = make_choice(["Da", "Ne"])
     if choice == "Da":
         USER.bookshelf.remove_book(book_title)
         print("Izbrisano.")
-<<<<<<< HEAD
         list_books()
     if choice == "Ne":
         print("Brisanje preklicano.")
         book_menu(book_title)
-=======
-    if choice == "Ne":
-        print("Brisanje preklicano.")
->>>>>>> ed3c69fcfd501c994c7f853cafe6b96a26666463
 
 def book_menu(book_title):
     reading_level = ["Nezačeta", "Začeta", "Prebrana"]
@@ -265,11 +256,7 @@ def main_menu():
 
 def main():
     print("Dobrodošli v Bralnem spremljevalcu.")
-<<<<<<< HEAD
     print("Želite ustvariti novo knjižno polico ali naložiti obstoječo?")
-=======
-    print("Želite ustvariti novo knjižno polico ali naložiti obstoječo?""")
->>>>>>> ed3c69fcfd501c994c7f853cafe6b96a26666463
     init()
     while True:
         main_menu()
