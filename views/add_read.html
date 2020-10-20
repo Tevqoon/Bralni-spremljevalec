@@ -1,0 +1,33 @@
+% rebase("base.html", username=username)
+
+<nav class="panel">
+    <p class="panel-heading">
+        {{selected}}
+    </p>
+    <div class="panel-block">
+        <b>Prosimo, vnesite čas branja in zadnjo prebrano stran:</b>
+    </div>
+    <div class="panel-block">
+        <div class="control">
+            <input class="input" type="text" placeholder="čas branja", name="time">
+        </div>
+    </div>
+    <div class="panel-block">
+        <div class="control">
+            <input class="input" type="text" placeholder="končna stran", name="page">
+        </div>
+    </div>
+    <div class="panel-block">
+       <div class="field-is-grouped">
+           
+           <a>
+               <input type="submit" class="button is-success" value="Potrdi" name="confirm">
+            </a>
+        </div>
+        <div class="column">
+            <a href={{"/library/" + selected + "/"}}>
+                <input type="submit" class="button is-danger" value="Prekliči" name="cancel">
+            </a>    
+        </div>
+    </div>
+</nav>

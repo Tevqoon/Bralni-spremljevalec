@@ -7,8 +7,7 @@ class Account:
         self.bookshelf = bookshelf
 
     def authenticate(self, password):
-        if self.password != password:
-            raise ValueError("Napačno geslo.")
+        return self.password == password
 
     def save_state(self, filename):
         state_dict = {
@@ -143,7 +142,8 @@ class Bookshelf:
                 "time_spent_h" : str(round(spent / 60, 1)),
                 "time_rest_h" : str(round((self.predicted_times(authors, categories, states) - spent) / 60, 1)),
                 "book_number" : self.book_number(authors, categories, states),
-                "finished_number" : self.book_number(authors, categories, [2]) if (2 in states) or (states == []) else 0.}
+                "finished_number" : self.book_number(authors, categories, [2]) 
+                                    if (2 in states) or (states == []) else 0.}
 
 class Book:
     def __init__(self, title, pages, current_page=0, author="", 
@@ -239,9 +239,3 @@ class Book:
                 "time_spent_h" : str(round(self.time_spent / 60, 1)),
                 "time_rest_h" : str(round((self.predicted_time() - self.time_spent) / 60, 1)),
                 "reading_rate" : str(self.reading_rate())}
-
-
-
-    
-
-

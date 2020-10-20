@@ -1,0 +1,88 @@
+<div class="column is-one-quarter">
+    <nav class="panel">
+        <p class="panel-heading">
+            Izbira filtrov
+        </p>
+        <form action="">
+            <p class="panel-tabs">
+                % for tab in filter_tabs:
+                % if tab == selected_filter_tab:
+                <a class="is-active">
+                    <input type="submit" value={{filter_titles[tab]}} name="tabc">
+                </a>
+                % else:
+                <a>
+                    <input type="submit" value={{filter_titles[tab]}} name="tabc">
+                </a>
+                % end
+                % end
+            </p>
+        </form>
+        <form action="" method="POST"> <!-- TODO: fix authors with spaces-->
+
+            % if selected_filter_tab == "authors":
+            %   for a in sorted(author_list):
+            %       if a in active_authors:
+                        <label class="panel-block">
+                            <input type="checkbox" value={{a.replace(" ", "%")}} name={{a.replace(" ", "%")}} checked>
+                            {{a}}
+                        </label>
+            %       else:
+                        <label class="panel-block">
+                            <input type="checkbox" value={{a.replace(" ", "%")}} name={{a.replace(" ", "%")}}>
+                            {{a}}
+                        </label>
+            %       end
+            %   end
+            % elif selected_filter_tab == "categories":
+            %   for c in sorted(category_list):
+            %       if c in active_categories:
+                        <label class="panel-block">
+                            <input type="checkbox" value={{c.replace(" ", "%")}} name={{c.replace(" ", "%")}} checked>
+                            {{c}}
+                        </label>
+            %       else:
+                        <label class="panel-block">
+                            <input type="checkbox" value={{c.replace(" ", "%")}} name={{c.replace(" ", "%")}}>
+                            {{c}}
+                        </label>
+            %       end
+            %   end
+            % elif selected_filter_tab == "reading_states":
+            %   for state in state_list:
+                    <label class="panel-block">
+                        <input type="checkbox" value={{state}} name={{state}}>
+                        {{state}}
+                    </label>
+            %   end
+            % end
+            
+            <div class="panel-block">
+                <div class="columns">
+                    <div class="column">
+                        <a>
+                            <input type="submit" class="button is-link" value="Določi filtre" name="update_filters">
+                        </a>
+                    </div>
+                    <div class="column">
+                        <a href={{"/library/" + filter_end}}>
+                            <input type="submit" class="button is-danger" value="Ponastavi filtre" name="reset_filters">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </nav>
+    
+    <nav class="panel">
+        <p class="panel-heading">
+            Knjige
+        </p>
+        % for book in sorted(filtered_books, key=lambda b: b.title):
+            % nospaces = book.title.replace(" ", "%")
+            <a class="panel-block" href={{"/library/" + nospaces + "/"}}>
+                {{book.title}}
+            </a>
+        % end
+    </nav>
+</div>

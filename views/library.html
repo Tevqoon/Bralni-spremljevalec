@@ -1,0 +1,111 @@
+% rebase("base.html", current_tab="library")
+% allbooks = shelf.get_books()
+
+% filter_tabs = ["authors", "categories", "reading_states"]
+% filter_titles = {"authors" : "Avtorji", "categories" : "Kategorije", "reading_states" : "Stanje branja"}
+% if not(defined("selected_filter_tab")):
+%   selected_filter_tab = "authors"
+% end
+
+% author_list = shelf.list_authors()
+% category_list = shelf.list_categories()
+% state_list = ["Nezačete", "Začete", "Prebrane"]
+
+% if not(defined("active_authors")):
+%   active_authors = []
+% end
+
+% if not(defined("active_categories")):
+%   active_categories = []
+% end
+
+% if not(defined("active_bookstates")):
+%   active_bookstates = []
+% end
+
+% filtered_books = shelf.get_books(active_authors, active_categories, active_bookstates)
+
+% if defined("selected"):
+%   filter_end = selected + "/"
+%   selected_book = shelf.get_book(selected.replace("%", " "))
+% else:
+%   filter_end = ""
+% end
+
+<div class="columns">
+    % sendlected = selected if defined("selected") else ""
+    % include("_filter_books.html", username=username, shelf=shelf, selected=sendlected, active_authors=active_authors, active_categories=active_categories, active_boostates=active_bookstates, selected_filter_tab=selected_filter_tab)
+
+    % if defined("selected"):
+        % stats = selected_book.basic_stats()
+        % page_nums = list(map(int, stats["progress_quotient"].split("/")))
+        <div class="column">
+            <nav class="panel">
+                <p class="panel-heading">
+                    {{selected.replace("%", " ")}}
+                </p>
+                <div class="panel-block">
+                    <b>{{"Avtor: " + selected_book.author}}</b>
+                </div>
+                <div class="panel-block">
+                    <b>{{"Kategorija: " + selected_book.category}}</b>
+                </div>
+                <div class="panel-block">
+                    <b>{{"Prebrane strani: " + stats["progress_quotient"] + " (" + stats["percentage"] + ")"}}</b>
+                </div>
+                <div class="panel-block">
+                    <progress class="progress is-success" value={{page_nums[0]}} max={{page_nums[1]}}>
+                    </div>
+                    <div class="panel-block">
+                        <b>{{"Dosedanji čas branja: " + stats["time_spent_h"] + " ur"}}</b>
+                    </div>
+                    <div class="panel-block">
+                        <b>{{"Predviden preostali čas: " + stats["time_rest_h"] + " ur"}}</b>
+                    </div>
+                    <div class="panel-block">
+                        <b>{{"Hitrost branja: " + stats["reading_rate"] + " min/stran"}}</b>
+                    </div>
+                    <div class="panel-block">
+                        <div class="columns">
+                        <div class="column">
+                            <a>
+                                <input type="submit" class="button is-link" value="Uredi knjigo">
+                            </a>
+                        </div>
+                        <div class="column">
+                            <a href={{"/addread/" + selected + "/"}}>
+                                <input type="submit" class="button is-success" value="Dodaj branje">
+                            </a>
+                        </div>
+                        <div class="column">
+                            <a>
+                                <input type="submit" class="button is-danger" value="Izbriši knjigo">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <nav class="panel">
+                <p class="panel-heading">
+                    <form action={{"/library/" + selected + "/test/"}}>
+                        <input type="submit" class="button" value="test" name="test">
+                    </form>
+                </p>
+            </nav>
+        </div>          
+    % else:
+        <div class="column">
+            <nav class="panel">
+                <p class="panel-heading">
+                    % if allbooks == []:
+                        Pozdravljeni. Kliktnite na "Dodaj knjigo" in dodajte svojo prvo knjigo.
+                    % else:
+                        Prosimo, izberite knjigo iz seznama.
+                    % end
+                </p>
+            </nav>
+        </div>
+    % end
+</div>
+

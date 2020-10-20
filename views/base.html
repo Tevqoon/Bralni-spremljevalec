@@ -1,0 +1,63 @@
+% tabs = ["library", "addbook","progresses"]
+% titles = {"library" : "Knjižnica", "progresses" : "Stanje knjižnice", "addbook" : "Dodaj knjigo"}
+% icons = {"library" : "fas fa-book", "progresses" : "fas fa-chart-bar", "addbook" : "fas fa-book-medical"}
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bralni spremljevalec</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.14.0/js/all.js"></script>
+</head>
+
+<body>
+    <nav class="navbar is-light">
+        <div class="container">
+            <div class="navbar-brand">
+                <span class="navbar-item">
+                    <span class="icon">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    % if defined('username'):
+                    %   account = username
+                    % else:
+                    %   account = "Uporabnik"
+                    % end
+                    <strong>{{account}}</strong>
+                </span>
+            </div>
+            <div class="navbar-start">
+                % for tab in tabs:
+                    % if defined('current_tab') and tab == current_tab:
+                        <a class="navbar-item is-active" href="/{{tab}}/">
+                    % else:
+                        <a class="navbar-item" href="/{{tab}}/">
+                    % end
+                    <span class="icon">
+                        <i class="{{icons[tab]}}"></i>
+                    </span>
+                    <span>{{titles[tab]}}</span>
+                </a>
+                % end
+            </div>
+            % if defined('username'):
+                <div class="navbar-end">
+                    <span>
+                        <form method="POST" action="/logout/">
+                            <input type="submit" class="button is-link" value="Odjava">
+                        </form>
+                </span>
+            </div>
+            % end
+        </div>
+    </nav>
+    <section class="section">
+        {{!base}}
+    </section>
+</body>
+
+</html>

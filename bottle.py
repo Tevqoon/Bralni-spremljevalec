@@ -2111,7 +2111,11 @@ class MultiDict(DictMixin):
         del self.dict[key]
 
     def __getitem__(self, key):
-        return self.dict[key][-1]
+        r = self.dict.get(key, None)
+        if r == None:
+            return None
+        else:
+            return r[-1]
 
     def __setitem__(self, key, value):
         self.append(key, value)
