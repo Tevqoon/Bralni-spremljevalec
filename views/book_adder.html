@@ -1,0 +1,52 @@
+% rebase("base.html", username=username, current_tab="addbook")
+
+<nav class="panel">
+    <p class="panel-heading">
+        Nova knjiga
+    </p>
+    <form method="POST">
+        <div class="panel-block">
+            <b>Vnesite podatke nove knjige. Naslov in število strani sta nujna podatka.</b>
+        </div>
+        <div class="panel-block">
+            <div class="control">
+                <input class="input" type="text" placeholder="naslov", name="book_title">
+            </div>
+        </div>
+        <div class="panel-block">
+            <div class="control">
+                <input class="input" type="text" placeholder="število strani", name="pages">
+            </div>
+        </div>
+        <div class="panel-block">
+            <div class="control">
+                <input class="input" type="text" placeholder="trenutna stran", name="current_page">
+            </div>
+        </div>
+        <div class="panel-block">
+            <div class="control">
+                <input class="input" type="text" placeholder="avtor", name="author">
+            </div>
+        </div>
+        <div class="panel-block">
+            <div class="control">
+                <input class="input" type="text" placeholder="kategorija", name="category">
+            </div>
+        </div>
+        <div class="panel-block">
+            <div class="control">
+                <input class="input" type="text" placeholder="dosedanji čas branja", name="time_spent">
+            </div>
+        </div>
+        <div class="panel-block">
+            <a>
+                <input type="submit" class="button is-success" value="Potrdi" name="confirm">
+            </a>
+            <div class="column">
+                <a>
+                    <input type="submit" class="button is-danger" value="Prekliči" name="cancel">
+                </a>
+            </div>
+        </div>
+    </form>
+</nav>

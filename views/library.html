@@ -10,6 +10,7 @@
 % author_list = shelf.list_authors()
 % category_list = shelf.list_categories()
 % state_list = ["Nezačete", "Začete", "Prebrane"]
+% state_numbers = {"Nezačete" : 0, "Začete" : 1, "Prebrane" : 2}
 
 % if not(defined("active_authors")):
 %   active_authors = []
@@ -23,9 +24,9 @@
 %   active_bookstates = []
 % end
 
-% filtered_books = shelf.get_books(active_authors, active_categories, active_bookstates)
+% filtered_books = shelf.get_books(active_authors, active_categories, [state_numbers[s] for s in active_bookstates])
 
-% if defined("selected"):
+% if defined("selected") and selected != None:
 %   filter_end = selected + "/"
 %   selected_book = shelf.get_book(selected.replace("%", " "))
 % else:
@@ -34,16 +35,20 @@
 
 <div class="columns">
     % sendlected = selected if defined("selected") else ""
-    % include("_filter_books.html", username=username, shelf=shelf, selected=sendlected, active_authors=active_authors, active_categories=active_categories, active_boostates=active_bookstates, selected_filter_tab=selected_filter_tab)
+    % include("_filter_books.html", username=username, url="/library/" + filter_end, shelf=shelf, selected=sendlected, active_authors=active_authors, active_categories=active_categories, active_boostates=active_bookstates, selected_filter_tab=selected_filter_tab)
 
-    % if defined("selected"):
+    % if defined("selected") and selected != None:
         % stats = selected_book.basic_stats()
         % page_nums = list(map(int, stats["progress_quotient"].split("/")))
+        % progress_type = "progress " + ("is-success" if page_nums[1] == page_nums[0] else "is-warning")
         <div class="column">
             <nav class="panel">
                 <p class="panel-heading">
                     {{selected.replace("%", " ")}}
                 </p>
+                <div class="panel-block">
+                    <progress class="{{progress_type}}" value={{page_nums[0]}} max={{page_nums[1]}}>
+                </div>
                 <div class="panel-block">
                     <b>{{"Avtor: " + selected_book.author}}</b>
                 </div>
@@ -53,22 +58,20 @@
                 <div class="panel-block">
                     <b>{{"Prebrane strani: " + stats["progress_quotient"] + " (" + stats["percentage"] + ")"}}</b>
                 </div>
+                
                 <div class="panel-block">
-                    <progress class="progress is-success" value={{page_nums[0]}} max={{page_nums[1]}}>
-                    </div>
-                    <div class="panel-block">
-                        <b>{{"Dosedanji čas branja: " + stats["time_spent_h"] + " ur"}}</b>
-                    </div>
-                    <div class="panel-block">
-                        <b>{{"Predviden preostali čas: " + stats["time_rest_h"] + " ur"}}</b>
-                    </div>
-                    <div class="panel-block">
-                        <b>{{"Hitrost branja: " + stats["reading_rate"] + " min/stran"}}</b>
-                    </div>
-                    <div class="panel-block">
-                        <div class="columns">
+                    <b>{{"Dosedanji čas branja: " + stats["time_spent_h"] + " ur"}}</b>
+                </div>
+                <div class="panel-block">
+                    <b>{{"Predviden preostali čas: " + stats["time_rest_h"] + " ur"}}</b>
+                </div>
+                <div class="panel-block">
+                    <b>{{"Povprečna hitrost branja: " + stats["reading_rate"] + " min/stran"}}</b>
+                </div>
+                <div class="panel-block">
+                    <div class="columns">
                         <div class="column">
-                            <a>
+                            <a href={{"/editbook/" + selected + "/"}}>
                                 <input type="submit" class="button is-link" value="Uredi knjigo">
                             </a>
                         </div>
@@ -78,20 +81,12 @@
                             </a>
                         </div>
                         <div class="column">
-                            <a>
+                            <a href={{"/deleter/" + selected + "/"}}>
                                 <input type="submit" class="button is-danger" value="Izbriši knjigo">
                             </a>
                         </div>
                     </div>
                 </div>
-            </nav>
-
-            <nav class="panel">
-                <p class="panel-heading">
-                    <form action={{"/library/" + selected + "/test/"}}>
-                        <input type="submit" class="button" value="test" name="test">
-                    </form>
-                </p>
             </nav>
         </div>          
     % else:

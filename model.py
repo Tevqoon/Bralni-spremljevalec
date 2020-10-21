@@ -137,13 +137,25 @@ class Bookshelf:
         return sum(times)
 
     def group_stats(self, authors=[], categories=[], states=[]):
+        books = self.get_books(authors, categories, states)
         spent = self.total_times(authors, categories, states)
+        book_num = self.book_number(authors, categories, states)
+        finished_num = self.book_number(authors, categories, [2]) if (2 in states) or (states == []) else 0
+        percentage = round(finished_num / book_num * 100, 2) if book_num != 0 else 0
+        pages = sum([book.pages for book in books])
+        read_pages = sum([book.current_page for book in books])
+
         return {"avg_rates" : str(round(self.average_rates(authors, categories, states), 2)),
                 "time_spent_h" : str(round(spent / 60, 1)),
                 "time_rest_h" : str(round((self.predicted_times(authors, categories, states) - spent) / 60, 1)),
-                "book_number" : self.book_number(authors, categories, states),
-                "finished_number" : self.book_number(authors, categories, [2]) 
-                                    if (2 in states) or (states == []) else 0.}
+                "book_number" : book_num,
+                "finished_number" : finished_num,
+                "progress_quotient" : str(finished_num) + "/" + str(book_num),
+                "percentage" : str(percentage) + "%",
+                "total_pages" : str(pages),
+                "current_page" : str(read_pages),
+                "pages_quotient" : str(read_pages) + "/" + str(pages),
+                "pages_percentage" : str(round(read_pages / pages * 100, 2)) + "%",}
 
 class Book:
     def __init__(self, title, pages, current_page=0, author="", 
@@ -203,8 +215,14 @@ class Book:
     def update_category(self, category):
         self.category = category
 
-    def update_state(self, new_state):
-        self.state = new_state
+    def update_state(self, state):
+        self.state = state
+
+    def update_current_page(self, current_page):
+        self.current_page = current_page
+
+    def update_time_spent(self, time_spent):
+        self.time_spent = time_spent
 
     def reset_progress(self):
         "Resets the reading progress for given book"
@@ -217,8 +235,6 @@ class Book:
         self.time_spent += session_time
         if final_page >= self.pages:
             self.state = 2
-        elif final_page <= self.pages:
-            return
         elif final_page > 0:
             self.state = 1
         self.current_page = min(self.pages, final_page)
@@ -235,7 +251,7 @@ class Book:
 
     def basic_stats(self):
         return {"progress_quotient" : str(self.current_page) + "/" + str(self.pages), 
-                "percentage" : str(round(self.current_page / self.pages, 4) * 100) + "%",
+                "percentage" : str(round(self.current_page / self.pages * 100, 2)) + "%",
                 "time_spent_h" : str(round(self.time_spent / 60, 1)),
                 "time_rest_h" : str(round((self.predicted_time() - self.time_spent) / 60, 1)),
                 "reading_rate" : str(self.reading_rate())}

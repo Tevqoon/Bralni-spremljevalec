@@ -1,0 +1,22 @@
+% rebase("base.html", username=username)
+
+<nav class="panel">
+    <p class="panel-heading">
+        {{selected.replace("%", " ")}}
+    </p>
+    <form method="POST">
+        <div class="panel-block">
+            <b>Ste prepričani da želite izbrisati knjigo iz knjižnice?</b>
+        </div>
+        <div class="panel-block">
+            <a>
+                <input type="submit" class="button is-danger" value="Potrdi" name="confirm">
+            </a>
+            <div class="column">
+                <a>
+                    <input type="submit" class="button is-success" value="Prekliči" name="cancel">
+                </a>
+            </div>
+        </div>
+    </form>
+</nav>

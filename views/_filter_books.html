@@ -1,3 +1,7 @@
+% if not(defined("url")):
+%   url = "/library/"
+% end
+
 <div class="column is-one-quarter">
     <nav class="panel">
         <p class="panel-heading">
@@ -6,55 +10,65 @@
         <form action="">
             <p class="panel-tabs">
                 % for tab in filter_tabs:
-                % if tab == selected_filter_tab:
-                <a class="is-active">
-                    <input type="submit" value={{filter_titles[tab]}} name="tabc">
-                </a>
-                % else:
-                <a>
-                    <input type="submit" value={{filter_titles[tab]}} name="tabc">
-                </a>
-                % end
+                    % if tab == selected_filter_tab:
+                        <a class="is-active">
+                            <input type="submit" value={{filter_titles[tab]}} name="tabc">
+                        </a>
+                    % else:
+                        <a>
+                            <input type="submit" value={{filter_titles[tab]}} name="tabc">
+                        </a>
+                    % end
                 % end
             </p>
         </form>
+        
         <form action="" method="POST"> <!-- TODO: fix authors with spaces-->
-
             % if selected_filter_tab == "authors":
-            %   for a in sorted(author_list):
-            %       if a in active_authors:
+                % for a in sorted(author_list):
+                    % ahat = a.replace("č", "c").replace("š", "s").replace("ž", "z")
+                    % if a in active_authors:
                         <label class="panel-block">
-                            <input type="checkbox" value={{a.replace(" ", "%")}} name={{a.replace(" ", "%")}} checked>
+                            <input type="checkbox" value={{ahat.replace(" ", "%")}} name={{ahat.replace(" ", "%")}} checked>
                             {{a}}
                         </label>
-            %       else:
+                    % else:
                         <label class="panel-block">
-                            <input type="checkbox" value={{a.replace(" ", "%")}} name={{a.replace(" ", "%")}}>
+                            <input type="checkbox" value={{ahat.replace(" ", "%")}} name={{ahat.replace(" ", "%")}}>
                             {{a}}
                         </label>
-            %       end
-            %   end
+                    % end
+                % end
             % elif selected_filter_tab == "categories":
-            %   for c in sorted(category_list):
-            %       if c in active_categories:
+                % for c in sorted(category_list):
+                    % chat = c.replace("č", "c").replace("š", "s").replace("ž", "z")
+                    % if c in active_categories:
                         <label class="panel-block">
-                            <input type="checkbox" value={{c.replace(" ", "%")}} name={{c.replace(" ", "%")}} checked>
+                            <input type="checkbox" value={{chat.replace(" ", "%")}} name={{chat.replace(" ", "%")}} checked>
                             {{c}}
                         </label>
-            %       else:
+                    % else:
                         <label class="panel-block">
-                            <input type="checkbox" value={{c.replace(" ", "%")}} name={{c.replace(" ", "%")}}>
+                            <input type="checkbox" value={{chat.replace(" ", "%")}} name={{chat.replace(" ", "%")}}>
                             {{c}}
                         </label>
-            %       end
-            %   end
+                    % end
+                % end
             % elif selected_filter_tab == "reading_states":
-            %   for state in state_list:
-                    <label class="panel-block">
-                        <input type="checkbox" value={{state}} name={{state}}>
-                        {{state}}
-                    </label>
-            %   end
+                % for s in state_list:
+                    % shat = s.replace("č", "c").replace("š", "s").replace("ž", "z")
+                    % if s in active_bookstates:
+                        <label class="panel-block">
+                            <input type="checkbox" value={{shat}} name={{shat}} checked>
+                            {{s}}
+                        </label>
+                    % else:
+                        <label class="panel-block">
+                            <input type="checkbox" value={{shat}} name={{shat}}>
+                            {{s}}
+                        </label>
+                    % end
+                % end
             % end
             
             <div class="panel-block">
@@ -65,7 +79,7 @@
                         </a>
                     </div>
                     <div class="column">
-                        <a href={{"/library/" + filter_end}}>
+                        <a href="{{url}}">
                             <input type="submit" class="button is-danger" value="Ponastavi filtre" name="reset_filters">
                         </a>
                     </div>

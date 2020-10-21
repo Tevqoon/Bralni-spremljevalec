@@ -1,0 +1,52 @@
+% rebase("base.html", username=username)
+
+<nav class="panel">
+    <p class="panel-heading">
+        {{selected.replace("%", " ")}}
+    </p>
+    <form method="POST">
+        <div class="panel-block">
+            <b>Vnesite spremenjene podatke. Česar nočete spremeniti pustite prazno.</b>
+        </div>
+        <div class="panel-block">
+            <div class="control">
+                <input class="input" type="text" placeholder="{{'Naslov: ' + book.title}}" name="book_title">
+            </div>
+        </div>
+        <div class="panel-block">
+            <div class="control">
+                <input class="input" type="text" placeholder="{{'Število strani: ' + str(book.pages)}}" name="pages">
+            </div>
+        </div>
+        <div class="panel-block">
+            <div class="control">
+                <input class="input" type="text" placeholder="{{'Trenutna stran: ' + str(book.current_page)}}", name="current_page">
+            </div>
+        </div>
+        <div class="panel-block">
+            <div class="control">
+                <input class="input" type="text" placeholder="{{'Avtor: ' + book.author}}", name="author">
+            </div>
+        </div>
+        <div class="panel-block">
+            <div class="control">
+                <input class="input" type="text" placeholder="{{'Kategorija: ' + book.category}}", name="category">
+            </div>
+        </div>
+        <div class="panel-block">
+            <div class="control">
+                <input class="input" type="text" placeholder="{{'Čas branja: ' + str(book.time_spent) + ' minut'}}", name="time_spent">
+            </div>
+        </div>
+        <div class="panel-block">
+            <a>
+                <input type="submit" class="button is-success" value="Potrdi" name="confirm">
+            </a>
+            <div class="column">
+                <a>
+                    <input type="submit" class="button is-danger" value="Prekliči" name="cancel">
+                </a>
+            </div>
+        </div>
+    </form>
+</nav>
