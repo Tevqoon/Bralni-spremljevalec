@@ -35,7 +35,7 @@
 
 <div class="columns">
     % sendlected = selected if defined("selected") else ""
-    % include("_filter_books.html", username=username, url="/library/" + filter_end, shelf=shelf, selected=sendlected, active_authors=active_authors, active_categories=active_categories, active_boostates=active_bookstates, selected_filter_tab=selected_filter_tab)
+    % include("_filter_books.html")
 
     % if defined("selected") and selected != None:
         % stats = selected_book.basic_stats()
@@ -96,7 +96,7 @@
                     % if allbooks == []:
                         Pozdravljeni. Kliktnite na "Dodaj knjigo" in dodajte svojo prvo knjigo.
                     % else:
-                        Izberite knjigo iz seznama.
+                        Iz seznama levo spodaj lahko izberete knjigo.
                     % end
                 </p>
             </nav>

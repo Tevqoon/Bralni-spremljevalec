@@ -1,5 +1,4 @@
 % rebase("base.html", current_tab="bookstats")
-% allbooks = shelf.get_books()
 
 % filter_tabs = ["authors", "categories", "reading_states"]
 % filter_titles = {"authors" : "Avtorji", "categories" : "Kategorije", "reading_states" : "Stanje branja"}
@@ -28,13 +27,13 @@
 
 
 <div class="columns">
-    % include("_filter_books.html", username=username, url="/bookstats/", shelf=shelf, active_authors=active_authors, active_categories=active_categories, active_boostates=active_bookstates, selected_filter_tab=selected_filter_tab)
+    % include("_filter_books.html")
     <div class="column">
         <nav class="panel">
             <p class="panel-heading">
                 Statistika za filtrirano skupino
             </p>
-            % stats = shelf.group_stats(active_authors, active_categories, active_bookstates)
+            % stats = shelf.group_stats(active_authors, active_categories, [state_numbers[s] for s in active_bookstates])
             <div class="panel-block">
                 <b>{{"Prebrane knjige v skupini: " + stats["progress_quotient"] + " (" + stats["percentage"] + ")"}}</b>
             </div>
@@ -45,15 +44,15 @@
                 <b>{{"Povprečna hitrost branja v skupini: " + stats["avg_rates"] + " min/stran"}}</b>
             </div>
             <div class="panel-block">
+                <b>{{"Predviden preostali čas za skupino: " + stats["time_rest_h"] + " ur"}}</b>
+            </div>
+            <div class="panel-block">
                 <div class="column is-one-quarter">
-                    <b>{{"Predviden preostali čas za skupino: " + stats["time_rest_h"] + " ur"}}</b>
+                    <b>{{"Skupne prebrane strani: " + stats["pages_quotient"] + " (" + stats["pages_percentage"] + ")"}}</b>
                 </div>
                 <div class="column">
                     <progress class="progress is-info is-large" value={{stats["current_page"]}} max={{stats["total_pages"]}}>
                 </div>
-            </div>
-            <div class="panel-block">
-                <b>{{"Skupne prebrane strani: " + stats["pages_quotient"] + " (" + stats["pages_percentage"] + ")"}}</b>
             </div>
             <div class="panel-block">
                 <b>Vizualizacija posameznih knjig v skupini:</b>

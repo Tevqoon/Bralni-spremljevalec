@@ -85,15 +85,24 @@ def library_post_no_selection():
 
 @bottle.get("/library/<title>/")
 def library_book(title):
-    tab_keys = {"Avtorji" : "authors", "Kategorije" : "categories", "Stanje" : "reading_states"}
+    tab_keys = {"Avtorji" : "authors", 
+                "Kategorije" : "categories", 
+                "Stanje" : "reading_states"}
     chosen_tab = bottle.request.query["tabc"]
     if chosen_tab == None:
         chosen_tab = "Avtorji"
-    return bottle.template("library.html", username=current_user_account().username, shelf=user_shelf(), selected=title, active_authors=filter_authors, active_categories=filter_categories, active_bookstates=filter_bookstates, selected_filter_tab=tab_keys[chosen_tab])
+    return bottle.template("library.html", 
+                            username=current_user_account().username, 
+                            shelf=user_shelf(), 
+                            selected=title, 
+                            active_authors=filter_authors, 
+                            active_categories=filter_categories, 
+                            active_bookstates=filter_bookstates, 
+                            selected_filter_tab=tab_keys[chosen_tab])
 
 @bottle.post("/library/<title>/")
 def library_filter_updates(title):
-    stats = (title == ("stats"))
+    stats = (title == ("stats")) #to see where to redirect
     global filter_authors
     global filter_categories
     global filter_bookstates
@@ -103,6 +112,7 @@ def library_filter_updates(title):
     chosen_tab = bottle.request.query["tabc"]
     if chosen_tab == None:
         chosen_tab = "Avtorji"
+
     if chosen_tab == "Avtorji":
         auths = []
         for a in all_auths:
@@ -132,14 +142,28 @@ def library_filter_updates(title):
         filter_categories = []
         filter_bookstates = []
     if stats:
-        return bottle.template("bookstats.html", username=current_user_account().username, shelf=user_shelf(), active_authors=filter_authors, active_categories=filter_categories, active_bookstates=filter_bookstates, selected_filter_tab=tab_keys[chosen_tab])
+        return bottle.template("bookstats.html", 
+                               username=current_user_account().username, 
+                               shelf=user_shelf(), 
+                               active_authors=filter_authors, 
+                               active_categories=filter_categories, 
+                               active_bookstates=filter_bookstates, 
+                               selected_filter_tab=tab_keys[chosen_tab])
     else:
-        return bottle.template("library.html", username=current_user_account().username, shelf=user_shelf(), selected=title, active_authors=filter_authors, active_categories=filter_categories, active_bookstates=filter_bookstates, selected_filter_tab=tab_keys[chosen_tab])
-
+        return bottle.template("library.html", 
+                               username=current_user_account().username, 
+                               shelf=user_shelf(), 
+                               selected=title, 
+                               active_authors=filter_authors, 
+                               active_categories=filter_categories, 
+                               active_bookstates=filter_bookstates, 
+                               selected_filter_tab=tab_keys[chosen_tab])
 
 @bottle.get("/addread/<title>/")
 def get_add_read(title):
-    return bottle.template("add_read.html", username=current_user_account().username, selected=title)
+    return bottle.template("add_read.html", 
+                           username=current_user_account().username, 
+                           selected=title)
 
 @bottle.post("/addread/<title>/")
 def post_add_read(title):
@@ -147,17 +171,23 @@ def post_add_read(title):
         bottle.redirect("/library/" + title + "/")
     reading_time = bottle.request.forms.getunicode("time")
     final_page = bottle.request.forms.getunicode("page")
-    if reading_time.isnumeric() and final_page.isnumeric():
+    # Get data by POST
+    if reading_time.isnumeric() and final_page.isnumeric(): # Check validity
         book = user_shelf().get_book(title.replace("%", " "))
         book.new_session(int(reading_time), int(final_page))
         save_current_account()
         bottle.redirect("/library/" + title + "/")
-    else:
-        return bottle.template("fail_readadd.html", username=current_user_account().username, selected=title)
+        # Add reading session and redirect
+    else: # In case of fail, redirect to failing page
+        return bottle.template("fail_readadd.html", 
+                               username=current_user_account().username, 
+                               selected=title)
 
 @bottle.get("/deleter/<title>/")
 def get_deleter(title):
-    return bottle.template("book_deleter.html", username=current_user_account().username, selected=title)
+    return bottle.template("book_deleter.html", 
+                           username=current_user_account().username, 
+                           selected=title)
 
 @bottle.post("/deleter/<title>/")
 def post_deleter(title):
@@ -170,7 +200,8 @@ def post_deleter(title):
         
 @bottle.get("/addbook/")
 def get_bookadd():
-    return bottle.template("book_adder.html", username=current_user_account().username)
+    return bottle.template("book_adder.html", 
+                           username=current_user_account().username)
 
 @bottle.post("/addbook/")
 def post_bookadd():
@@ -182,39 +213,53 @@ def post_bookadd():
     author = bottle.request.forms.getunicode("author")
     category = bottle.request.forms.getunicode("category")
     time_spent = bottle.request.forms.getunicode("time_spent")
-    if not(title or pages) and (current_page.isnumeric() or current_page == "") and (time_spent.isnumeric() or time_spent == ""):
-        return bottle.template("fail_addbook.html", username = current_user_account().username)
+    # Grab data by POST
+    if not((title or pages) 
+           and (current_page.isnumeric() or current_page == "") 
+           and (time_spent.isnumeric() or time_spent == "")):
+        return bottle.template("fail_addbook.html", 
+                               username = current_user_account().username)
+    # Check validity of data
     pages = int(pages)
-    if current_page == "":
-        current_page = 0
-    else:
-        current_page = int(current_page)
-    if time_spent == "":
-        time_spent = 0
-    else:
-        time_spent = int(time_spent)
-    book = model.Book(title, pages, current_page, author, category, time_spent)
+    current_page = 0 if current_page == "" else int(current_page)
+    time_spent = 0 if time_spent == "" else int(time_spent)
+    if current_page > pages:
+        current_page = pages
+    # Convert numeric data into numbers
+    book = model.Book(title, pages, 
+                      current_page, author, 
+                      category, time_spent)
+    # Create a new book object with said data
     user_shelf().add_book(book)
     save_current_account()
     bottle.redirect("/library/")
+    # Add the new book to user's library and redirect.
 
 @bottle.get("/editbook/<title>/")
 def get_editbook(title):
     book = user_shelf().get_book(title.replace("%", " "))
-    return bottle.template("book_editor.html", username=current_user_account().username, selected=title, book=book)
+    return bottle.template("book_editor.html", 
+                           username=current_user_account().username,
+                           selected=title, book=book)
 
 @bottle.post("/editbook/<title>/")
 def post_editbook(title):
     if bottle.request.forms.getunicode("cancel"):
-        bottle.redirect("/library/")
+        bottle.redirect("/library/" + title + "/")
     new_title = bottle.request.forms.getunicode("book_title")
     pages = bottle.request.forms.getunicode("pages")
     current_page = bottle.request.forms.getunicode("current_page")
     author = bottle.request.forms.getunicode("author")
     category = bottle.request.forms.getunicode("category")
     time_spent = bottle.request.forms.getunicode("time_spent")
-    if not((pages.isnumeric() or pages == "") and (current_page.isnumeric() or current_page == "") and (time_spent.isnumeric() or time_spent == "")):
-        return bottle.template("fail_edit.html", username=current_user_account().username, selected=title)
+    # Grab data by POST 
+    if not((pages.isnumeric() or pages == "")
+            and (current_page.isnumeric() or current_page == "") 
+            and (time_spent.isnumeric() or time_spent == "")):
+        return bottle.template("fail_edit.html", 
+                               username=current_user_account().username,
+                               selected=title)
+    # Check validity of data
     book = user_shelf().get_book(title.replace("%", " "))
     if new_title != "":
         title = new_title.replace(" ", "%")
@@ -229,19 +274,26 @@ def post_editbook(title):
         book.update_current_page(int(current_page))
     if time_spent != "":
         book.update_time_spent(int(time_spent))
+    # If a value is to be changed, update the given argument
     save_current_account()
     bottle.redirect("/library/" + title + "/")
+    # Save account and redirect
 
 @bottle.get("/bookstats/")
 def get_stats():
     chosen_tab = bottle.request.query["tabc"]
     if chosen_tab == None:
         chosen_tab = "Avtorji"
-    return bottle.template("bookstats.html", username=current_user_account().username, shelf=user_shelf(), active_authors=filter_authors, active_categories=filter_categories, active_bookstates=filter_bookstates, selected_filter_tab=tab_keys[chosen_tab])
+    return bottle.template("bookstats.html", 
+                        username=current_user_account().username, 
+                        shelf=user_shelf(), 
+                        active_authors=filter_authors, 
+                        active_categories=filter_categories, 
+                        active_bookstates=filter_bookstates, 
+                        selected_filter_tab=tab_keys[chosen_tab])
 
 @bottle.post("/bookstats/")
 def stats_filter_updates():
     return library_filter_updates(("stats"))
 
-
-bottle.run(debug=True, reloader=True)
+bottle.run()

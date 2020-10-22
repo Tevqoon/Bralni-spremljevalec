@@ -140,14 +140,30 @@ class Bookshelf:
         books = self.get_books(authors, categories, states)
         spent = self.total_times(authors, categories, states)
         book_num = self.book_number(authors, categories, states)
-        finished_num = self.book_number(authors, categories, [2]) if (2 in states) or (states == []) else 0
-        percentage = round(finished_num / book_num * 100, 2) if book_num != 0 else 0
+        if (2 in states) or (states == []):
+            finished_num = self.book_number(authors, categories, [2])
+        else:
+            finished_num = 0
+        if book_num != 0:
+            percentage = round(finished_num / book_num * 100, 2) 
+        else:
+            percentage =  0
         pages = sum([book.pages for book in books])
         read_pages = sum([book.current_page for book in books])
-
-        return {"avg_rates" : str(round(self.average_rates(authors, categories, states), 2)),
+        if pages != 0:
+            pages_percentage = round(read_pages / pages * 100, 2) 
+        else:
+            pages_percentage = 0
+        remaining_time = round((self.predicted_times(authors, 
+                                                     categories, 
+                                                     states)
+                               - spent) / 60, 1)
+        average_rates = round(self.average_rates(authors, 
+                                                 categories, 
+                                                 states), 2)
+        return {"avg_rates" : str(average_rates),
                 "time_spent_h" : str(round(spent / 60, 1)),
-                "time_rest_h" : str(round((self.predicted_times(authors, categories, states) - spent) / 60, 1)),
+                "time_rest_h" : str(remaining_time),
                 "book_number" : book_num,
                 "finished_number" : finished_num,
                 "progress_quotient" : str(finished_num) + "/" + str(book_num),
@@ -155,7 +171,7 @@ class Bookshelf:
                 "total_pages" : str(pages),
                 "current_page" : str(read_pages),
                 "pages_quotient" : str(read_pages) + "/" + str(pages),
-                "pages_percentage" : str(round(read_pages / pages * 100, 2)) + "%",}
+                "pages_percentage" : str(pages_percentage) + "%",}
 
 class Book:
     def __init__(self, title, pages, current_page=0, author="", 
