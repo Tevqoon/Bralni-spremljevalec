@@ -194,7 +194,7 @@ def post_deleter(title):
     if bottle.request.forms.getunicode("cancel"):
         bottle.redirect("/library/" + title + "/")
     elif bottle.request.forms.getunicode("confirm"):
-        user_shelf().remove_book(title)
+        user_shelf().remove_book(title.replace("%", " "))
         save_current_account()
         bottle.redirect("/library/")
         
